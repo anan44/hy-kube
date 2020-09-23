@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uuid-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uuid
+  template:
+    metadata:
+      labels:
+        app: uuid
+    spec:
+      volumes:
+        - name: shared-files
+          persistentVolumeClaim:
+            claimName: main-claim
+      containers:
+        - name: uuid-writer
+          image: ananaa/uuid-writer:110
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: shared-files
+              mountPath: /app/files
+          env:
+            - name: TIME_FILE_PATH
+              value: "/app/files/time.txt"
+        - name: uuid-reader
+          image: ananaa/uuid-reader:111
+          imagePullPolicy: Always
+          env:
+            - name: ROCKET_PORT
+              value: "4000"
+            - name: TIME_FILE_PATH
+              value: "/app/files/time.txt"
+            - name: COUNT_FILE_PATH
+              value: "/app/files/count.txt"
+          volumeMounts:
+            - name: shared-files
+              mountPath: /app/files

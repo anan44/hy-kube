@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pingpong-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pingpong
+  template:
+    metadata:
+      labels:
+        app: pingpong
+    spec:
+      volumes:
+        - name: shared-files
+          persistentVolumeClaim:
+            claimName: main-claim
+      containers:
+        - name: pingpong
+          image: ananaa/pingpong:111
+          imagePullPolicy: Always
+          env:
+            - name: ROCKET_PORT
+              value: "4000"
+            - name: COUNT_FILE_PATH
+              value: "/app/files/count.txt"
+          volumeMounts:
+            - name: shared-files
+              mountPath: /app/files

@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crudster-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crudster
+  template:
+    metadata:
+      labels:
+        app: crudster
+    spec:
+      volumes:
+        - name: shared-images
+          emptyDir: {}
+      containers:
+        - name: crudster
+          image: ananaa/crudster:113
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: shared-images
+              mountPath: "/app/files"
+          env:
+            - name: ROCKET_PORT
+              value: "4000"
+            - name: IMAGE_FILE_PATH
+              value: "/app/files/daily_image.jpg"
